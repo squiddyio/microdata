@@ -204,14 +204,22 @@ func (p *Parser) readItem(item *Item, node *html.Node) *Item {
 				}
 
 			default:
-				var text bytes.Buffer
-				walk(node, func(n *html.Node) {
-					if n.Type == html.TextNode {
-						text.WriteString(n.Data)
-					}
 
-				})
-				propertyValue = text.String()
+				// Support common miuse of content attribute for nonsupported
+				// elements
+				if val, exists := getAttr("content", node); exists {
+					propertyValue = val
+				} else {
+					var text bytes.Buffer
+					walk(node, func(n *html.Node) {
+						if n.Type == html.TextNode {
+							text.WriteString(n.Data)
+						}
+
+					})
+					propertyValue = text.String()
+				}
+
 			}
 
 			if len(propertyValue) > 0 {

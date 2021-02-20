@@ -48,6 +48,21 @@ func TestParse(t *testing.T) {
 
 }
 
+func TestParseMisuseOfContentAttribute(t *testing.T) {
+	html := `
+	<div itemscope>
+	 <p>Item is <span itemprop="availability" content="https://schema.org/InStock">
+	 	in stock</span>.</p>
+	</div>`
+
+	item := ParseOneItem(html, t)
+
+	if item.Properties["availability"][0].(string) != "https://schema.org/InStock" {
+		t.Errorf("Property value not found")
+	}
+
+}
+
 func TestParseActuallyParses(t *testing.T) {
 	html := `
 	<div itemscope>
